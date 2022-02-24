@@ -2,7 +2,7 @@ version: 1.0
 type: update
 name: 'S3 Mount Manager'
 id: 's3fs'
-baseUrl=https://raw.githubusercontent.com/layershift/jps-s3fs/main
+baseUrl: https://raw.githubusercontent.com/layershift/jps-s3fs/main
 
 categories:
  - apps/others
@@ -94,7 +94,7 @@ actions:
       - if [ $? -eq 0 ]; then echo "s3fs is installed"; else echo "s3fs is not installed"; fi;
       user: root
       sayYes: true 
-     return:
+    - return:
       type: success
       message: ${response.out}
 
