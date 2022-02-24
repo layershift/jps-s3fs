@@ -1,0 +1,107 @@
+version: 1.0
+type: update
+name: 'S3 Mount Manager'
+id: 's3fs'
+
+
+categories:
+ - apps/others
+
+description:
+  short: Add/Edit/Remove S3 Mounts
+
+targetNodes:
+  nodeType:
+  - tomcat
+
+settings:
+  add:
+    fields:
+    - type: string
+      caption: Bucket name
+      name: bucketName
+      required: true
+
+    - type: string
+      caption: Mount password
+      name: mountPassword
+      required: true
+
+    - type: string
+      caption: Mount location
+      name: mountLocation
+      required: true
+
+
+    - type: string
+      caption: URL
+      name: mountURL
+      required: true
+
+buttons:
+  - caption: Check status
+    loadingText: Checking..
+    action: checkStatus
+  - menu:
+    - caption: Add mount
+      loadingText: Adding mount..
+      settings: add
+      confirmText: Are you sure you wish to add this mount?
+      action: addMount
+      successText: Success
+
+onAfterRedeployContainer [cp]:
+  - forEach(event.response.responses):
+      deployRPM:
+        nodeId: ${@i.nodeid}
+
+
+onInstall: doInstall
+
+onAfterScaleOut [nodeGroup:cp]:
+  - forEach(event.response.nodes):
+      deployRPM:
+        nodeId: ${@i.id}
+
+
+onUninstall:
+  - forEach(nodes.cp):
+    - cmd [${@i.id}]:
+      - if [ $(mount | grep -i ^s3fs | wc -l) -eq 0 ]; then yum -y remove s3fs-fuse; else echo "Mounts exist"; exit 1; fi;
+      sayYes: true
+      user: root
+
+
+actions:
+  doInstall:
+    - forEach(nodes.cp):
+        deployRPM:
+          nodeId: ${@i.id}
+  deployRPM:
+    - cmd[${this.nodeId}]:
+      - echo -e "\n\nOn node ${targetNodes.join(id,)}";
+      - which rpm 2>/dev/null >/dev/null; if [ $? -gt 0 ]; then echo -e "Issue:\nrpm not found"; exit 0; fi;
+      - yum -y install epel-release; if [ $? -gt 0 ]; then echo -e "\nIssue:\nCan't install epel-release"; exit 0; fi;
+      - yum -y install s3fs-fuse; if [ $? -gt 0 ]; then echo -e "\nIssue:\nCan't install s3fs"; exit 0; fi;
+      sayYes: true
+      user: root
+  checkStatus:
+    - cmd [cp]:
+      - rpm -q s3fs-fuse 2>&1 1>/dev/null
+      - if [ $? -eq 0 ]; then echo "s3fs is installed"; else echo "s3fs is not installed"; fi;
+      user: root
+      sayYes: true 
+     return:
+      type: success
+      message: ${response.out}
+  addMount:
+    - cmd [cp]:
+      - HOME_DIR=$(grep jelastic /etc/passwd | awk -F ":" '{print $6}')
+      - if [ ! -d $HOME_DIR/.s3fs/secrets ]; then mkdir -p $HOME_DIR/.s3fs/secrets; fi;
+      - if [ ! -d $HOME_DIR/.s3fs/mounts ]; then mkdir -p $HOME_DIR/.s3fs/mounts; fi;
+      - echo ${mountPassword} > $HOME_DIR/.s3fs/secrets/${bucketName}
+      - echo 's3fs ${bucketName} ${mountLocation} -o passwd_file=$HOME_DIR/secrets/${bucketName} -o url=${mountURL} -o allow_other' > $HOME_DIR/.s3fs/mounts/${bucketName}
+      - chmod 600 $HOME_DIR/.s3fs/secrets/${bucketName}
+      - /usr/local/bin/wrapper.sh mount $HOME_DIR/.s3fs/mounts/${bucketName}
+      user: jelastic
+      sayYes: true
