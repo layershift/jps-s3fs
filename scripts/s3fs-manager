@@ -71,6 +71,12 @@ while [[ $# -gt 0 ]]; do
 		list)
 			action="list"
         ;;
+        mountall)
+			action="mountall"
+		;;
+		umountall)
+			action="umountall"
+		;;
     esac;
 done;
 
