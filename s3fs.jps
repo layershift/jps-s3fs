@@ -2,7 +2,7 @@ version: 1.0
 type: update
 name: 'S3 Mount Manager'
 id: 's3fs'
-
+baseUrl=https://raw.githubusercontent.com/layershift/jps-softether/main
 
 categories:
  - apps/others
@@ -83,6 +83,8 @@ actions:
       - which rpm 2>/dev/null >/dev/null; if [ $? -gt 0 ]; then echo -e "Issue:\nrpm not found"; exit 0; fi;
       - yum -y install epel-release; if [ $? -gt 0 ]; then echo -e "\nIssue:\nCan't install epel-release"; exit 0; fi;
       - yum -y install s3fs-fuse; if [ $? -gt 0 ]; then echo -e "\nIssue:\nCan't install s3fs"; exit 0; fi;
+      - wget ${baseUrl}/scripts/userAdd.sh -O /usr/local/vpnserver/userAdd.sh;
+
       sayYes: true
       user: root
   checkStatus:
@@ -102,6 +104,6 @@ actions:
       - echo ${mountPassword} > $HOME_DIR/.s3fs/secrets/${bucketName}
       - echo 's3fs ${bucketName} ${mountLocation} -o passwd_file=$HOME_DIR/secrets/${bucketName} -o url=${mountURL} -o allow_other' > $HOME_DIR/.s3fs/mounts/${bucketName}
       - chmod 600 $HOME_DIR/.s3fs/secrets/${bucketName}
-      - /usr/local/bin/wrapper.sh mount $HOME_DIR/.s3fs/mounts/${bucketName}
+      - /usr/local/bin/script mount $HOME_DIR/.s3fs/mounts/${bucketName}
       user: jelastic
       sayYes: true
