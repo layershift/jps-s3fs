@@ -38,6 +38,15 @@ settings:
       name: mountURL
       required: true
 
+  remove:
+    fields:
+    - type: string
+      caption: Bucket name
+      name: bucketName
+      required: true    
+
+
+
 buttons:
   - caption: Check status
     loadingText: Checking..
@@ -49,6 +58,17 @@ buttons:
       confirmText: Are you sure you wish to add this mount?
       action: addMount
       successText: Success
+
+    - caption: Remove mount
+      loadingText: Removing mount..
+      settings: remove
+      confirmText: Are you sure you wish to remove this mount?
+      action: removeMount
+      successText: Success
+
+    - caption: List mounts
+      action: listMounts
+
 
 onAfterRedeployContainer [cp]:
   - forEach(event.response.responses):
@@ -106,9 +126,24 @@ actions:
       - HOME_DIR=$(grep jelastic /etc/passwd | awk -F ":" '{print $6}')
       - if [ ! -d $HOME_DIR/.s3fs/secrets ]; then mkdir -p $HOME_DIR/.s3fs/secrets; fi;
       - if [ ! -d $HOME_DIR/.s3fs/mounts ]; then mkdir -p $HOME_DIR/.s3fs/mounts; fi;
-      - echo ${settings.mountPassword} > $HOME_DIR/.s3fs/secrets/${settings.bucketName}
-      - echo 's3fs ${settings.bucketName} ${settings.mountLocation} -o passwd_file=$HOME_DIR/secrets/${settings.bucketName} -o url=${settings.mountURL} -o allow_other' > $HOME_DIR/.s3fs/mounts/${settings.bucketName}
-      - chmod 600 $HOME_DIR/.s3fs/secrets/${settings.bucketName}
-      - /usr/local/bin/s3fs-manager mount $HOME_DIR/.s3fs/mounts/${settings.bucketName}
+      - echo ${settings.mountPassword} > $HOME_DIR/.s3fs/secrets/${settings.bucketName};
+      - echo "s3fs ${settings.bucketName} ${settings.mountLocation} -o passwd_file=$HOME_DIR/secrets/${settings.bucketName} -o url=${settings.mountURL} -o allow_other" > $HOME_DIR/.s3fs/mounts/${settings.bucketName};
+      - chmod 600 $HOME_DIR/.s3fs/secrets/${settings.bucketName};
+      - /usr/local/bin/s3fs-manager mount $HOME_DIR/.s3fs/mounts/${settings.bucketName};
+      - if [ $? -ne 0 ]; then rm $HOME_DIR/.s3fs/secrets/${settings.bucketName}; rm $HOME_DIR/.s3fs/mounts/${settings.bucketName}; fi;
+      user: jelastic
+      sayYes: true
+
+  removeMount:
+    - cmd [cp]:
+      - HOME_DIR=$(grep jelastic /etc/passwd | awk -F ":" '{print $6}')
+      - /usr/local/bin/s3fs-manager umount $HOME_DIR/.s3fs/mounts/${settings.bucketName};
+      user: jelastic
+      sayYes: true
+
+  listMounts:
+    - cmd [cp]:
+      - HOME_DIR=$(grep jelastic /etc/passwd | awk -F ":" '{print $6}')
+      - /usr/local/bin/s3fs-manager list;
       user: jelastic
       sayYes: true
