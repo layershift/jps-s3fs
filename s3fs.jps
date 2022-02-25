@@ -85,6 +85,7 @@ actions:
       - yum -y install epel-release; if [ $? -gt 0 ]; then echo -e "\nIssue:\nCan't install epel-release"; exit 0; fi;
       - yum -y install s3fs-fuse; if [ $? -gt 0 ]; then echo -e "\nIssue:\nCan't install s3fs"; exit 0; fi;
       - wget ${baseUrl}/scripts/s3fs-manager -O /usr/local/bin/s3fs-manager;
+      - chmod +x /usr/local/bin/s3fs-manager;
       sayYes: true
       user: root
 
@@ -99,13 +100,15 @@ actions:
       message: ${response.out}
 
   addMount:
+#    - log: "${globals.print()}"
+#    - log: "${settings.print()}"
     - cmd [cp]:
       - HOME_DIR=$(grep jelastic /etc/passwd | awk -F ":" '{print $6}')
       - if [ ! -d $HOME_DIR/.s3fs/secrets ]; then mkdir -p $HOME_DIR/.s3fs/secrets; fi;
       - if [ ! -d $HOME_DIR/.s3fs/mounts ]; then mkdir -p $HOME_DIR/.s3fs/mounts; fi;
-      - echo ${mountPassword} > $HOME_DIR/.s3fs/secrets/${bucketName}
-      - echo 's3fs ${bucketName} ${mountLocation} -o passwd_file=$HOME_DIR/secrets/${bucketName} -o url=${mountURL} -o allow_other' > $HOME_DIR/.s3fs/mounts/${bucketName}
-      - chmod 600 $HOME_DIR/.s3fs/secrets/${bucketName}
-      - /usr/local/bin/s3fs-manager mount $HOME_DIR/.s3fs/mounts/${bucketName}
+      - echo ${settings.mountPassword} > $HOME_DIR/.s3fs/secrets/${settings.bucketName}
+      - echo 's3fs ${settings.bucketName} ${settings.mountLocation} -o passwd_file=$HOME_DIR/secrets/${settings.bucketName} -o url=${settings.mountURL} -o allow_other' > $HOME_DIR/.s3fs/mounts/${settings.bucketName}
+      - chmod 600 $HOME_DIR/.s3fs/secrets/${settings.bucketName}
+      - /usr/local/bin/s3fs-manager mount $HOME_DIR/.s3fs/mounts/${settings.bucketName}
       user: jelastic
       sayYes: true
