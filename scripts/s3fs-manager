@@ -83,6 +83,7 @@ done;
 
 case $action in
 	mount)
+		mkdir $(awk '{print $3}' $mountLocation)
 		/bin/bash $mountLocation
 
 	;;
