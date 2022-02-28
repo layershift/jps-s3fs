@@ -87,14 +87,18 @@ case $action in
 		/bin/bash $mountLocation
 		if [ $? -eq 0 ]; then
 			echo "$(awk {'print $2'} $mountLocation) mounted on $(awk {'print $3'} $mountLocation)";
+		else
+			echo "Cannot mount"
 		fi;
 
 	;;
 
 	umount)
-		fusermount -u $( awk '{print $3}' $mountLocation )
+		fusermount -u $( awk '{print $3}' $mountLocation ) 
 		if [ $? -eq 0 ]; then
 			echo "$(awk {'print $2'} $mountLocation) unmounted from $(awk {'print $3'} $mountLocation)";
+		else
+			echo "Cannot unmount"
 		fi;
 
 	;;
