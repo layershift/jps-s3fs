@@ -83,13 +83,19 @@ done;
 
 case $action in
 	mount)
-		mkdir $(awk '{print $3}' $mountLocation)
+		mkdir -p $(awk '{print $3}' $mountLocation)
 		/bin/bash $mountLocation
+		if [ $? -eq 0 ]; then
+			echo "$(awk {'print $2'} $mountLocation) mounted on $(awk {'print $3'} $mountLocation)";
+		fi;
 
 	;;
 
 	umount)
 		fusermount -u $( awk '{print $3}' $mountLocation )
+		if [ $? -eq 0 ]; then
+			echo "$(awk {'print $2'} $mountLocation) unmounted from $(awk {'print $3'} $mountLocation)";
+		fi;
 
 	;;
 
