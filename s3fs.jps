@@ -20,7 +20,7 @@ settings:
     - type: string
       caption: Bucket name
       name: bucketName
-      regex: "[/\S+/]"
+#      regex: "[/\S+/]"
       regexTest: No white spaces
       tooltip: "Mount directory from bucket: BucketName:/DirectoryName"
       required: true
@@ -39,7 +39,7 @@ settings:
     - type: string
       caption: URL [http://myurl.tld]
       name: mountURL
-      regex: "^https?://[\-aA-zZ0-9]*\.[aA-zZ]*"
+#      regex: "^https?://[\-aA-zZ0-9]*\.[aA-zZ]*"
       regexTest: Full URL required (http(s)://myurl.tld)
       required: true
 
@@ -174,6 +174,7 @@ actions:
   removeMount:
     - cmd [cp]:
       - HOME_DIR=$(grep jelastic /etc/passwd | awk -F ":" '{print $6}')
+      - /usr/local/bin/s3fs-manager umount $HOME_DIR/.s3fs/mounts/${settings.bucketName};
       - if [ -f $HOME_DIR/.s3fs/mounts/${settings.bucketName}]; then rm -f $HOME_DIR/.s3fs/mounts/${settings.bucketName}; fi;
       - if [ -f $HOME_DIR/.s3fs/secrets/${settings.bucketName}]; then rm -f $HOME_DIR/.s3fs/secrets/${settings.bucketName}; fi;
       user: jelastic
