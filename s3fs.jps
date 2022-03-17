@@ -118,7 +118,8 @@ onAfterScaleOut [nodeGroup:cp]:
 onUninstall:
   - forEach(nodes.cp):
     - cmd [${@i.id}]:
-      - if [ $(mount | grep -i ^s3fs | wc -l) -eq 0 ]; then yum -y remove s3fs-fuse; else echo "Mounts exist"; exit 1; fi;
+      - if [ $(mount | grep -i ^s3fs | wc -l) -eq 0 ]; then yum -y remove s3fs-fuse; else echo "Mounts exist. Unmount first"; exit 1; fi;
+      - if [ -f /etc/cron.d/s3fs ]; then rm -f /etc/cron.d/s3fs; fi;
       sayYes: true
       user: root
 

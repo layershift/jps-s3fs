@@ -119,7 +119,7 @@ case $action in
 		for bucketname in $(ls -1 ~/.s3fs/mounts/); do
         		MOUNTPOINT=$(awk '{print $3}' ~/.s3fs/mounts/$bucketname )
         		mount | grep -q $MOUNTPOINT 2>/dev/null
-        		if [ $? -eq 0 ]; then
+        		if [ $? -ne 0 ]; then
                 	/bin/bash ~/.s3fs/mounts/$bucketname
                 	echo "$bucketname - MOUNTED on $MOUNTPOINT"
                 else
@@ -132,7 +132,7 @@ case $action in
 		for bucketname in $(ls -1 ~/.s3fs/mounts/); do
         		MOUNTPOINT=$(awk '{print $3}' ~/.s3fs/mounts/$bucketname )
         		mount | grep -q $MOUNTPOINT 2>/dev/null
-        		if [ $? -ne 0 ]; then
+        		if [ $? -eq 0 ]; then
                 	fusermount -u $MOUNTPOINT
                 	echo "$bucketname - UNMOUNTED from $MOUNTPOINT"
                 else
