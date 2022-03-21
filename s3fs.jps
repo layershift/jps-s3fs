@@ -175,8 +175,8 @@ actions:
     - cmd [cp]:
       - HOME_DIR=$(grep jelastic /etc/passwd | awk -F ":" '{print $6}')
       - /usr/local/bin/s3fs-manager umount $HOME_DIR/.s3fs/mounts/${settings.bucketName};
-      - if [ -f $HOME_DIR/.s3fs/mounts/${settings.bucketName}]; then rm -f $HOME_DIR/.s3fs/mounts/${settings.bucketName}; fi;
-      - if [ -f $HOME_DIR/.s3fs/secrets/${settings.bucketName}]; then rm -f $HOME_DIR/.s3fs/secrets/${settings.bucketName}; fi;
+      - if [ -f $HOME_DIR/.s3fs/mounts/${settings.bucketName} ]; then rm -f $HOME_DIR/.s3fs/mounts/${settings.bucketName}; fi;
+      - if [ -f $HOME_DIR/.s3fs/secrets/${settings.bucketName} ]; then rm -f $HOME_DIR/.s3fs/secrets/${settings.bucketName}; fi;
       user: jelastic
       sayYes: true
       return:
