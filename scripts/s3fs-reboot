@@ -1,0 +1,12 @@
+#!/bin/bash
+HOME_DIR=$(grep jelastic /etc/passwd | awk -F ":" '{print $6}')
+for mount in $(awk '{print $3}' $HOME_DIR/.s3fs/mounts/*); do
+	mount | grep $mount | grep -q "user_id=0";
+	if [[ $? -eq 0 ]]; then
+		fusermount -u $mount;
+	fi;
+done;
+sleep 10;
+sudo -u jelastic /usr/local/bin/s3fs-manager umountall;
+sleep 10;
+sudo -u jelastic /usr/local/bin/s3fs-manager mountall;

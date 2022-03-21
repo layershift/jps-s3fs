@@ -137,8 +137,10 @@ actions:
       - yum -y install epel-release; if [ $? -gt 0 ]; then echo -e "\nIssue:\nCan't install epel-release"; exit 0; fi;
       - yum -y install s3fs-fuse; if [ $? -gt 0 ]; then echo -e "\nIssue:\nCan't install s3fs"; exit 0; fi;
       - wget ${baseUrl}/scripts/s3fs-manager -O /usr/local/bin/s3fs-manager;
+      - wget ${baseUrl}/scripts/s3fs-reboot -O /usr/local/bin/s3fs-reboot;
       - chmod +x /usr/local/bin/s3fs-manager;
-      - echo "@reboot jelastic /usr/local/bin/s3fs-manager mountall" > /etc/cron.d/s3fs
+      - chmod +x /usr/local/bin/s3fs-reboot;
+      - echo "@reboot root /bin/bash /usr/local/bin/s3fs-reboot 2>&1 >/dev/null" > /etc/cron.d/s3fs
       sayYes: true
       user: root
 

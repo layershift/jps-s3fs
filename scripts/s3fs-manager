@@ -105,7 +105,7 @@ case $action in
 
 	list)
 		CHECKVAR=$(ls -1 ~/.s3fs/mounts/ | wc -l)
-		if [[ "$CHECKVAR" -eq 0 ]]; then echo "No mounts available"; fi;
+			if [[ "$CHECKVAR" -eq 0 ]]; then echo "No mounts available"; fi;
 		for bucketname in $(ls -1 ~/.s3fs/mounts/); do
         		MOUNTPOINT=$(awk '{print $3}' ~/.s3fs/mounts/$bucketname )
         		mount | grep -q $MOUNTPOINT 2>/dev/null
