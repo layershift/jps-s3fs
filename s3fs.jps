@@ -20,7 +20,7 @@ settings:
     - type: string
       caption: Bucket name
       name: bucketName
-#      regex: "[/\S+/]"
+#      regex: "^[/\S+/]*$"
       regexTest: No white spaces
       tooltip: "Mount directory from bucket: BucketName:/DirectoryName"
       required: true
@@ -39,7 +39,7 @@ settings:
     - type: string
       caption: URL [http://myurl.tld]
       name: mountURL
-#      regex: "^https?://[\-aA-zZ0-9]*\.[aA-zZ]*"
+#      regex: "^https?:\/\/[\-aA-zZ0-9]*\.[\-aA-zZ0-9]*.[aA-zZ]*$"
       regexTest: Full URL required (http(s)://myurl.tld)
       required: true
 
@@ -162,7 +162,7 @@ actions:
       - if [ ! -d $HOME_DIR/.s3fs/secrets ]; then mkdir -p $HOME_DIR/.s3fs/secrets; fi;
       - if [ ! -d $HOME_DIR/.s3fs/mounts ]; then mkdir -p $HOME_DIR/.s3fs/mounts; fi;
       - echo ${settings.mountPassword} > $HOME_DIR/.s3fs/secrets/${settings.bucketName};
-      - echo "s3fs ${settings.bucketName} ${settings.mountLocation} -o passwd_file=$HOME_DIR/.s3fs/secrets/${settings.bucketName} -o url=${settings.mountURL} -o allow_other" > $HOME_DIR/.s3fs/mounts/${settings.bucketName};
+      - echo "s3fs ${settings.bucketName} ${settings.mountLocation} -o passwd_file=$HOME_DIR/.s3fs/secrets/${settings.bucketName} -o url=${settings.mountURL} -o allow_other -o nonempty" > $HOME_DIR/.s3fs/mounts/${settings.bucketName};
       - chmod 600 $HOME_DIR/.s3fs/secrets/${settings.bucketName};
       - /usr/local/bin/s3fs-manager mount $HOME_DIR/.s3fs/mounts/${settings.bucketName};
       - if [ $? -ne 0 ]; then rm $HOME_DIR/.s3fs/secrets/${settings.bucketName}; rm $HOME_DIR/.s3fs/mounts/${settings.bucketName}; fi;
