@@ -83,7 +83,13 @@ done;
 
 case $action in
 	mount)
-		mkdir -p $(awk '{print $3}' $mountLocation)
+		MOUNTPOINT=$(awk '{print $3' $mountLocation)
+		echo $MOUNTPOINT | egrep -q "^/root|^/$"
+		if [ $? -eq 0 ]; then
+			echo "Invalid mountpoint"
+			exit 1;
+		fi;
+		mkdir -p $MOUNTPOINT
 		/bin/bash $mountLocation
 		if [ $? -eq 0 ]; then
 			echo "$(awk {'print $2'} $mountLocation) mounted on $(awk {'print $3'} $mountLocation)";
@@ -110,9 +116,9 @@ case $action in
         		MOUNTPOINT=$(awk '{print $3}' ~/.s3fs/mounts/$bucketname )
         		mount | grep -q $MOUNTPOINT 2>/dev/null
         		if [ $? -eq 0 ]; then
-                	echo "$bucketname - MOUNTED on $MOUNTPOINT"
+                	echo -e "\n $bucketname - MOUNTED on $MOUNTPOINT"
         		else
-                	echo "$bucketname - NOT MOUNTED"
+                	echo -e "\n $bucketname - NOT MOUNTED"
         		fi;
 		done;
 	;;
@@ -120,13 +126,23 @@ case $action in
 	mountall)
 		for bucketname in $(ls -1 ~/.s3fs/mounts/); do
         		MOUNTPOINT=$(awk '{print $3}' ~/.s3fs/mounts/$bucketname )
+        		echo $MOUNTPOINT | egrep -q "^/root|^/$"
+        		if [ $? -eq 0 ]; then
+        			echo -e "\n Invalid mountpoint"
+        			continue
+        		fi;
+
         		mount | grep -q $MOUNTPOINT 2>/dev/null
         		if [ $? -ne 0 ]; then
                 	/bin/bash ~/.s3fs/mounts/$bucketname
-                	echo "$bucketname - MOUNTED on $MOUNTPOINT"
+
+                if [ $? -eq 0 ]; then
+                	echo -e "\n $bucketname - MOUNTED on $MOUNTPOINT"
                 else
-                	echo "Operation failed"
+                	echo -e "\n Failed to mount $bucketname"
+                	continue
                 fi;
+            fi;
 		done;
 	;;
 
@@ -136,9 +152,11 @@ case $action in
         		mount | grep -q $MOUNTPOINT 2>/dev/null
         		if [ $? -eq 0 ]; then
                 	fusermount -u $MOUNTPOINT
-                	echo "$bucketname - UNMOUNTED from $MOUNTPOINT"
+      			if [ $? - ne 0 ]; then
+      				echo -e "\n $bucketname - UNMOUNTED from $MOUNTPOINT"
                 else
-                	echo "Operation failed"
+                	echo -e "\n Cannot unmount $bucketname"
+                	continue
                 fi;
 		done;
 	;;

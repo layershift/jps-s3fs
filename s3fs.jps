@@ -20,7 +20,7 @@ settings:
     - type: string
       caption: Bucket name
       name: bucketName
-#      regex: "^[/\S+/]*$"
+      regex: ^[/\S+/]*$
       regexTest: No white spaces
       tooltip: "Mount directory from bucket: BucketName:/DirectoryName"
       required: true
@@ -37,9 +37,9 @@ settings:
 
 
     - type: string
-      caption: URL [http://myurl.tld]
+      caption: URL [https://myurl.tld]
       name: mountURL
-#      regex: "^https?:\/\/[\-aA-zZ0-9]*\.[\-aA-zZ0-9]*.[aA-zZ]*$"
+      regex: ^https?:\/\/[\-aA-zZ0-9.]*
       regexTest: Full URL required (http(s)://myurl.tld)
       required: true
 
