@@ -12,7 +12,26 @@ description:
 
 targetNodes:
   nodeType:
+  - apache
+  - apache2
+  - apache2-ruby
+  - nginxphp
+  - nginx-ruby
   - tomcat
+  - postgresql
+  - glassfish
+  - payara
+  - jetty
+  - springboot
+  - nodejs
+  - litespeedphp
+  - lemp
+  - golang
+  - mysql
+  - mariadb
+  - perconadb
+  - mongodb
+  - redis
 
 settings:
   add:
@@ -33,6 +52,7 @@ settings:
     - type: string
       caption: Mount location
       name: mountLocation
+      regex: 
       required: true
 
 
@@ -155,8 +175,6 @@ actions:
       message: ${response.out}
 
   addMount:
-#    - log: "${globals.print()}"
-#    - log: "${settings.print()}"
     - cmd [cp]:
       - HOME_DIR=$(grep jelastic /etc/passwd | awk -F ":" '{print $6}')
       - if [ ! -d $HOME_DIR/.s3fs/secrets ]; then mkdir -p $HOME_DIR/.s3fs/secrets; fi;
