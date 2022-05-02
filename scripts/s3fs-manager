@@ -158,6 +158,7 @@ case $action in
                 	echo -e "\n Cannot unmount $bucketname"
                 	continue
                 fi;
+            fi;
 		done;
 	;;
 
