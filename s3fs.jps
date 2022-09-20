@@ -28,7 +28,7 @@ targetNodes:
   - lemp
   - golang
   - mysql
-  - mariadb
+  - mariadb-dockerized
   - perconadb
   - mongodb
   - redis
