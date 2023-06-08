@@ -143,7 +143,6 @@ case $action in
 					echo -e "\n Failed to mount $bucketname"
 					continue
                 fi;
-            fi;
 		done;
 	;;
 
